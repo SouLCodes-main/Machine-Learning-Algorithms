@@ -1,13 +1,4 @@
-import pandas as pd
 import numpy as np
-
-df = pd.read_csv('Social_Network_Ads.csv')
-df = df.drop(['User ID', 'Gender'], axis=1)
-
-X = df[['Age', 'EstimatedSalary']].values
-y = df['Purchased'].values.reshape(-1, 1)
-
-X_scaled = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
@@ -53,3 +44,31 @@ def gradient_descent(X, y, learning_rate=0.01, num_iterations=1000):
         b -= learning_rate * db
 
     return w, b, loss
+
+if __name__ == "__main__":
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    # 1. Load and clean the data
+    df = pd.read_csv('data.csv')
+    X = df[['Age', 'EstimatedSalary']].values
+    y = df['Purchased'].values.reshape(-1, 1)
+
+    # 2. Scale the features
+    X_scaled = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
+
+    # 3. Train the model (Catching the returned parameters)
+    print("Training model...")
+    w_trained, b_trained, history = gradient_descent(X_scaled, y, learning_rate=0.1, num_iterations=1000)
+
+    # 4. Test Accuracy (Passing the trained parameters in)
+    predictions = predict(X_scaled, w_trained, b_trained)
+    accuracy = np.mean(predictions == y) * 100
+    print(f"Final Model Accuracy: {accuracy:.2f}%")
+
+    # 5. Visualize
+    plt.plot(range(len(history)), history, color='red')
+    plt.title('Cost History over Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.show()
